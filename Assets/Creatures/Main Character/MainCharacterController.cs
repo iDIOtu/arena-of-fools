@@ -4,6 +4,7 @@ using UnityEngine;
 public class MainCharacterController : MonoBehaviour
 {
     [SerializeField] private Transform _camera;
+    [SerializeField] private Health—ontrol _healthControl;
     [SerializeField] private float _speedMove;
     [SerializeField] private float _gravity;
     [SerializeField] private float _jumpForse;
@@ -14,6 +15,7 @@ public class MainCharacterController : MonoBehaviour
     private Vector3 _moveDirection;
     private float _yDirection = 0.0f;
     private float _xRotation = 0.0f;
+    private float _healthPoints = 100.0f;
 
     private void Awake()
     {
@@ -75,5 +77,17 @@ public class MainCharacterController : MonoBehaviour
         _camera.localRotation = Quaternion.Euler(_xRotation, 0.0f, 0.0f);
 
         transform.Rotate(Input.GetAxis("Mouse X") * _speedRotate * Time.deltaTime * Vector3.up);
+    }
+
+    public void GetDamage(float damage)
+    {
+        _healthPoints -= damage * Time.deltaTime;
+
+        _healthControl.SetHealth(damage);
+
+        if (_healthPoints <= 0)
+        {
+            Debug.Log("you DIED MUHAHAHAHAHA");
+        }
     }
 }

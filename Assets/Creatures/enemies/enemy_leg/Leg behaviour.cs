@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -5,6 +6,7 @@ public class Legbehaviour : MonoBehaviour
 {
     [SerializeField] private float _attackRange;
     [SerializeField] private float _damageradius;
+    [SerializeField] private float _damage;
 
     private Animator _animator;
     private NavMeshAgent _agent;
@@ -23,13 +25,13 @@ public class Legbehaviour : MonoBehaviour
 
         if (distance < _attackRange)
         {
-
             Collider[] colliders = Physics.OverlapSphere(transform.position, _damageradius);
             foreach (Collider collider in colliders)
             {
                 if (collider.TryGetComponent(out MainCharacterController player))
                 {
                     _animator.SetBool("isAttacking", true);
+                    player.GetDamage(_damage);
                 }
             }
         }

@@ -3,7 +3,8 @@ using UnityEngine.AI;
 
 public class Legbehaviour : MonoBehaviour
 {
-    [SerializeField] private float attackRange;
+    [SerializeField] private float _attackRange;
+    [SerializeField] private float _damageradius;
 
     private Animator _animator;
     private NavMeshAgent _agent;
@@ -17,18 +18,29 @@ public class Legbehaviour : MonoBehaviour
     }
 
     private void Update()
-    {
-        _agent.SetDestination(_player.position);
+    {   
         float distance = Vector3.Distance(_animator.transform.position, _player.position);
 
-        if (distance < attackRange)
+        if (distance < _attackRange)
         {
-            _animator.SetBool("isAttacking", true);
-        }
 
-        if (distance > attackRange+10)
+            Collider[] colliders = Physics.OverlapSphere(transform.position, _damageradius);
+            foreach (Collider collider in colliders)
+            {
+                if (collider.TryGetComponent(out MainCharacterController player))
+                {
+                    _animator.SetBool("isAttacking", true);
+                }
+            }
+        }
+        else
         {
             _animator.SetBool("isAttacking", false);
+        }
+
+        if (_animator.GetCurrentAnimatorStateInfo(0).IsName("run"))
+        {
+            _agent.SetDestination(_player.position);
         }
     }
 }

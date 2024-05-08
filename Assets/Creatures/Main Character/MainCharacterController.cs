@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
@@ -9,6 +10,7 @@ public class MainCharacterController : MonoBehaviour
     [SerializeField] private float _gravity;
     [SerializeField] private float _jumpForse;
     [SerializeField] private float _speedRotate;
+    [SerializeField] private float _damageradius;
 
     private Animator _animator;
     private CharacterController _controller;
@@ -16,6 +18,7 @@ public class MainCharacterController : MonoBehaviour
     private float _yDirection = 0.0f;
     private float _xRotation = 0.0f;
     private float _healthPoints = 100.0f;
+    private bool isAttacking = true;
 
     private void Awake()
     {
@@ -42,6 +45,12 @@ public class MainCharacterController : MonoBehaviour
 
         _yDirection -= _gravity * Time.deltaTime;
         _controller.Move(_moveDirection);
+
+        if (Input.GetMouseButton(0) && isAttacking)
+        {
+            _animator.SetTrigger("Attack");
+            StartCoroutine(AttackWithDelay());
+        }
     }
 
     private void SetMoveDirection()
@@ -79,15 +88,34 @@ public class MainCharacterController : MonoBehaviour
         transform.Rotate(Input.GetAxis("Mouse X") * _speedRotate * Time.deltaTime * Vector3.up);
     }
 
+    private void Attack()
+    {
+        Collider[] colliders = Physics.OverlapSphere(transform.position, _damageradius);
+        foreach (Collider collider in colliders)
+        {
+            if (collider.TryGetComponent(out Legbehaviour leg))
+            {
+                leg.GetDamage(3.0f);
+            }
+        }
+    }
+
     public void GetDamage(float damage)
     {
-        _healthPoints -= damage * Time.deltaTime;
+        _healthPoints -= damage;
 
         _healthControl.SetHealth(damage);
 
         if (_healthPoints <= 0)
         {
-            Debug.Log("you DIED MUHAHAHAHAHA");
+
         }
+    }
+
+    IEnumerator AttackWithDelay()
+    {
+        isAttacking = false;
+        yield return new WaitForSeconds(1.0f);
+        isAttacking = true;
     }
 }

@@ -1,5 +1,7 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.UIElements;
 
 [RequireComponent(typeof(CharacterController))]
 public class MainCharacterController : MonoBehaviour
@@ -12,44 +14,52 @@ public class MainCharacterController : MonoBehaviour
     [SerializeField] private float _speedRotate;
     [SerializeField] private float _damageradius;
 
+    public PlayableDirector _castScene;
+
     private Animator _animator;
     private CharacterController _controller;
+    private Collider _collider;
     private Vector3 _moveDirection;
     private float _yDirection = 0.0f;
     private float _xRotation = 0.0f;
     private float _healthPoints = 100.0f;
     private bool isAttacking = true;
+    private bool _isDeath = false;
 
     private void Awake()
     {
+        _collider = GetComponent<Collider>();
         _controller = GetComponent<CharacterController>();
         _animator = GetComponent<Animator>();
     }
 
     private void Update()
     {
-        SetMoveDirection();
-
-        if (_controller.isGrounded)
+        if (!_isDeath)
         {
-            _yDirection = 0.0f;
+            SetMoveDirection();
 
-            _animator.SetBool("Jump", false);
-            if (Input.GetButton("Jump"))
+            if (_controller.isGrounded)
             {
-                Jump();
+                _yDirection = 0.0f;
+
+                _animator.SetBool("Jump", false);
+                if (Input.GetButton("Jump"))
+                {
+                    Jump();
+                }
             }
-        }
 
-        Rotate();
+            Rotate();
 
-        _yDirection -= _gravity * Time.deltaTime;
-        _controller.Move(_moveDirection);
+            _yDirection -= _gravity * Time.deltaTime;
+            _controller.Move(_moveDirection);
 
-        if (Input.GetMouseButton(0) && isAttacking)
-        {
-            _animator.SetTrigger("Attack");
-            StartCoroutine(AttackWithDelay());
+            if (Input.GetMouseButton(0) && isAttacking)
+            {
+                _animator.SetTrigger("Attack");
+                StartCoroutine(AttackWithDelay());
+            }
         }
     }
 
@@ -88,7 +98,7 @@ public class MainCharacterController : MonoBehaviour
         transform.Rotate(Input.GetAxis("Mouse X") * _speedRotate * Time.deltaTime * Vector3.up);
     }
 
-    private void Attack()
+    public void Attack()
     {
         Collider[] colliders = Physics.OverlapSphere(transform.position, _damageradius);
         foreach (Collider collider in colliders)
@@ -108,14 +118,19 @@ public class MainCharacterController : MonoBehaviour
 
         if (_healthPoints <= 0)
         {
-
+            _collider.enabled = false;
+            _castScene.Play();
+            _animator.SetTrigger("IsDeath");
+            _isDeath = true;
         }
     }
 
     IEnumerator AttackWithDelay()
     {
         isAttacking = false;
+
         yield return new WaitForSeconds(1.0f);
+
         isAttacking = true;
     }
 }

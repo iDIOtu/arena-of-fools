@@ -14,9 +14,8 @@ public class Legbehaviour : MonoBehaviour
     private Transform _player;
     private float _healthPoints = 9.0f;
     private bool isAttacking = true;
-    private bool isDeath = true;
 
-    private void Start()
+    private void Awake()
     {
         _agent = GetComponent<NavMeshAgent>();
         _animator = GetComponent<Animator>();
@@ -43,19 +42,11 @@ public class Legbehaviour : MonoBehaviour
     {
         _healthPoints -= damage;
 
-        if (_healthPoints <= 0 && isDeath)
+        if (_healthPoints <= 0)
         {
             _animator.SetTrigger("isDeath");
-            StartCoroutine(DestroyAfterDelay());
+            Destroy(gameObject, 3.0f);
         }
-    }
-
-
-    private IEnumerator DestroyAfterDelay()
-    {
-        isDeath = false;
-        yield return new WaitForSeconds(3.0f);
-        Destroy(gameObject);
     }
 
     private void Attack()

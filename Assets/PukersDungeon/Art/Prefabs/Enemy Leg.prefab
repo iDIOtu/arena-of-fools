@@ -92,6 +92,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy Leg
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0bece702f83239441a6044d5aef9451a, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
+      objectReference: {fileID: 0}
     - target: {fileID: 1206409980451418169, guid: 0bece702f83239441a6044d5aef9451a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 23.218145
@@ -283,7 +287,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _damageradius: 15
-  _damage: 50
+  _damage: 10
   _attackDelay: 1
   _maxHealth: 9
 --- !u!195 &8294716062909848427
